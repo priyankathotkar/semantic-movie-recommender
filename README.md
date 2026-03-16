@@ -13,10 +13,10 @@ system designed to *improve* the user's emotional state — not just reflect it.
 This repository contains two core machine learning modules extracted from the
 CineAI recommendation system.
 
-1. `recommender.py` — semantic movie retrieval using FAISS embeddings and
+1. `recommender.py` - semantic movie retrieval using FAISS embeddings and
    opposite-mood emotion logic.
 
-2. `drift_detector.py` — preference drift detection using LightGBM with
+2. `drift_detector.py` - preference drift detection using LightGBM with
    Stratified K-Fold cross-validation.
 
 The repository demonstrates how I structure ML components, document design
