@@ -59,9 +59,9 @@ class DriftDetector:
         }
 
 
-    # ---------------------------------------------------
+    
     # Convert genre string → one-hot vector
-    # ---------------------------------------------------
+   
 
     def genre_to_vector(self, genre_string):
 
@@ -79,9 +79,9 @@ class DriftDetector:
         return vector
 
 
-    # ---------------------------------------------------
+   
     # Add user interaction event
-    # ---------------------------------------------------
+  
 
     def add_event(self, genre):
 
@@ -93,9 +93,8 @@ class DriftDetector:
             self.train()
 
 
-    # ---------------------------------------------------
     # Cross-Validated LightGBM Training
-    # ---------------------------------------------------
+
 
     def train(self):
         """
@@ -117,7 +116,7 @@ class DriftDetector:
         # normalize features
         X_scaled = self.scaler.fit_transform(X)
 
-        # ── Stratified K-Fold Cross-Validation ──────────────────────────────
+        # ── Stratified K-Fold Cross-Validation ──
         skf = StratifiedKFold(n_splits=self.n_splits, shuffle=True, random_state=42)
 
         self.cv_scores = []
@@ -147,7 +146,7 @@ class DriftDetector:
         else:
             print("[DriftDetector] CV AUC unavailable.")
 
-        # ── Train final model on full data after CV ──────────────────────────
+        # ── Train final model on full data after CV ──
         self.model = lgb.LGBMClassifier(**self.lgbm_params)
         self.model.fit(X_scaled, y)
 
@@ -156,9 +155,7 @@ class DriftDetector:
         return self.mean_auc
 
 
-    # ---------------------------------------------------
     # Detect drift on recent interactions
-    # ---------------------------------------------------
 
     def detect_drift(self):
         """
@@ -187,9 +184,8 @@ class DriftDetector:
         return drift_score > self.drift_threshold
 
 
-    # ---------------------------------------------------
     # Get feature importances (which genres drive drift)
-    # ---------------------------------------------------
+ 
 
     def get_feature_importances(self):
         """
@@ -209,9 +205,8 @@ class DriftDetector:
         ))
 
 
-    # ---------------------------------------------------
     # Full drift report
-    # ---------------------------------------------------
+ 
 
     def get_report(self):
         """
