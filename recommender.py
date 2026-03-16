@@ -10,7 +10,6 @@ from sentence_transformers import SentenceTransformer
 # Sad user → uplifting/happy movies to cheer them up
 # Angry user → calming/light movies to cool them down
 
-
 EMOTION_MOOD_GENRES = {
     # Feeling sad → recommend uplifting, feel-good, funny movies
     "sad":      ["Comedy", "Animation", "Family", "Adventure"],
@@ -75,7 +74,6 @@ EMOTION_QUERY_MAP = {
 
 
 class MovieRecommender:
-
     def __init__(
         self,
         embeddings_pkl:  str = "models/movie_embeddings.pkl",
@@ -97,8 +95,6 @@ class MovieRecommender:
 
 
     # Load dataset + FAISS index
- 
-
     def _load(self):
         print("[Recommender] Loading dataset...")
 
@@ -127,11 +123,8 @@ class MovieRecommender:
         self.index = faiss.read_index(str(self.faiss_index_path))
 
         print(f"[Recommender] Ready — {len(self.movies)} movies loaded")
-
   
     # Core FAISS search
-  
-
     def _faiss_search(self, vector: np.ndarray, top_k: int = 30):
         query = np.array(vector, dtype=np.float32).reshape(1, -1)
         faiss.normalize_L2(query)
@@ -139,15 +132,11 @@ class MovieRecommender:
         return distances[0], indices[0]
 
     # Semantic search via text query
-
-
     def _semantic_search(self, query_text: str, top_k: int = 30):
         vector = self.encoder.encode([query_text])[0].astype(np.float32)
         return self._faiss_search(vector, top_k)
 
     # Build result dict
-    
-
     def _build_result(self, idx: int, score: float) -> Optional[dict]:
         if idx < 0 or idx >= len(self.movies):
             return None
@@ -160,8 +149,6 @@ class MovieRecommender:
 
 
     # Recommend by genre (centroid-based)
-  
-
     def recommend_by_genre(self, genre: str, top_n: int = 10) -> List[dict]:
         genre_lower = genre.strip().lower()
 
@@ -239,8 +226,6 @@ class MovieRecommender:
         return results[:top_n]
 
     # General recommend entry point
-    
-
     def recommend(
         self,
         query:   Optional[str]       = None,
