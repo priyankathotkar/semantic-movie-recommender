@@ -5,14 +5,13 @@ from pathlib import Path
 from typing import Optional, List
 from sentence_transformers import SentenceTransformer
 
-# ---------------------------------------------------
 # OPPOSITE-MOOD MAPPING
 # Mission: counter the user's emotion, not reinforce it.
 # Sad user → uplifting/happy movies to cheer them up
 # Angry user → calming/light movies to cool them down
-# ---------------------------------------------------
 
-EMOTION_GENRE_MAP = {
+
+EMOTION_MOOD_GENRES = {
     # Feeling sad → recommend uplifting, feel-good, funny movies
     "sad":      ["Comedy", "Animation", "Family", "Adventure"],
 
@@ -96,9 +95,9 @@ class MovieRecommender:
 
         self._load()
 
-    # ---------------------------------------------------
+
     # Load dataset + FAISS index
-    # ---------------------------------------------------
+ 
 
     def _load(self):
         print("[Recommender] Loading dataset...")
@@ -129,9 +128,9 @@ class MovieRecommender:
 
         print(f"[Recommender] Ready — {len(self.movies)} movies loaded")
 
-    # ---------------------------------------------------
+  
     # Core FAISS search
-    # ---------------------------------------------------
+  
 
     def _faiss_search(self, vector: np.ndarray, top_k: int = 30):
         query = np.array(vector, dtype=np.float32).reshape(1, -1)
@@ -139,17 +138,15 @@ class MovieRecommender:
         distances, indices = self.index.search(query, top_k)
         return distances[0], indices[0]
 
-    # ---------------------------------------------------
     # Semantic search via text query
-    # ---------------------------------------------------
+
 
     def _semantic_search(self, query_text: str, top_k: int = 30):
         vector = self.encoder.encode([query_text])[0].astype(np.float32)
         return self._faiss_search(vector, top_k)
 
-    # ---------------------------------------------------
     # Build result dict
-    # ---------------------------------------------------
+    
 
     def _build_result(self, idx: int, score: float) -> Optional[dict]:
         if idx < 0 or idx >= len(self.movies):
@@ -161,9 +158,9 @@ class MovieRecommender:
             "score":  round(float(score), 4),
         }
 
-    # ---------------------------------------------------
+
     # Recommend by genre (centroid-based)
-    # ---------------------------------------------------
+  
 
     def recommend_by_genre(self, genre: str, top_n: int = 10) -> List[dict]:
         genre_lower = genre.strip().lower()
@@ -197,9 +194,9 @@ class MovieRecommender:
 
         return results
 
-    # ---------------------------------------------------
+  
     # Recommend by emotion (opposite-mood logic)
-    # ---------------------------------------------------
+ 
 
     def recommend_by_emotion(self, emotion: str, top_n: int = 10) -> List[dict]:
         emotion = emotion.strip().lower()
@@ -217,7 +214,7 @@ class MovieRecommender:
         seen    = set()
         results = []
 
-        # ── 1. Semantic search (most powerful) ──────────────────────────────
+        # ── 1. Semantic search (most powerful) ──────────
         sem_distances, sem_indices = self._semantic_search(query_text, top_k=top_n * 2)
 
         for dist, idx in zip(sem_distances, sem_indices):
@@ -226,7 +223,7 @@ class MovieRecommender:
                 seen.add(result["title"])
                 results.append(result)
 
-        # ── 2. Genre centroid search as supplement ───────────────────────────
+        # ── 2. Genre centroid search as supplement ──────
         per_genre = max(3, top_n // len(genres))
 
         for genre in genres:
@@ -241,9 +238,8 @@ class MovieRecommender:
 
         return results[:top_n]
 
-    # ---------------------------------------------------
     # General recommend entry point
-    # ---------------------------------------------------
+    
 
     def recommend(
         self,
