@@ -78,7 +78,7 @@ print(detector.get_report())
 ```
 
 To use `recommender.py` you will need to generate the model files from
-your movie dataset — contact the author for the embedding generation script.
+your movie dataset.
 
 ---
 
